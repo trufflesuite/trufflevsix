@@ -48,7 +48,7 @@ namespace TruffleVSIX
         public const string PackageGuidString = "8782a030-f21c-4cd9-9588-a6127bb3414c";
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Truffle"/> class.
+        /// Initializes a new instance of the <see cref="TruffleMenu"/> class.
         /// </summary>
         public TrufflePackage()
         {
@@ -66,7 +66,7 @@ namespace TruffleVSIX
         /// </summary>
         protected override void Initialize()
         {
-            Truffle.Initialize(this);
+            TruffleMenu.Initialize(this);
             base.Initialize();
         }
 

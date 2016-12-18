@@ -15,12 +15,14 @@ namespace TruffleVSIX
     /// <summary>
     /// Command handler
     /// </summary>
-    internal sealed class Truffle
+    internal sealed class TruffleMenu
     {
         /// <summary>
         /// Command ID.
         /// </summary>
-        public const int CommandId = 0x0100;
+        public const int CompileCommandId = 0x0100;
+        public const int MigrateCommandId = 0x0110;
+        public const int AboutCommandId   = 0x0900;
 
         /// <summary>
         /// Command menu group (command set GUID).
@@ -33,11 +35,11 @@ namespace TruffleVSIX
         private readonly Package package;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Truffle"/> class.
+        /// Initializes a new instance of the <see cref="TruffleMenu"/> class.
         /// Adds our command handlers for menu (commands must exist in the command table file)
         /// </summary>
         /// <param name="package">Owner package, not null.</param>
-        private Truffle(Package package)
+        private TruffleMenu(Package package)
         {
             if (package == null)
             {
@@ -46,11 +48,19 @@ namespace TruffleVSIX
 
             this.package = package;
 
+            this.addCommand(CompileCommandId, this.MenuItemCallback);
+            this.addCommand(MigrateCommandId, this.MenuItemCallback);
+            this.addCommand(AboutCommandId, this.ShowAboutBoxCallback);
+        }
+
+        public void addCommand(int commandId, EventHandler handler)
+        {
             OleMenuCommandService commandService = this.ServiceProvider.GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
+
             if (commandService != null)
             {
-                var menuCommandID = new CommandID(CommandSet, CommandId);
-                var menuItem = new MenuCommand(this.MenuItemCallback, menuCommandID);
+                var menuCommandID = new CommandID(CommandSet, commandId);
+                var menuItem = new MenuCommand(handler, menuCommandID);
                 commandService.AddCommand(menuItem);
             }
         }
@@ -58,7 +68,7 @@ namespace TruffleVSIX
         /// <summary>
         /// Gets the instance of the command.
         /// </summary>
-        public static Truffle Instance
+        public static TruffleMenu Instance
         {
             get;
             private set;
@@ -81,7 +91,7 @@ namespace TruffleVSIX
         /// <param name="package">Owner package, not null.</param>
         public static void Initialize(Package package)
         {
-            Instance = new Truffle(package);
+            Instance = new TruffleMenu(package);
         }
 
         /// <summary>
@@ -94,8 +104,8 @@ namespace TruffleVSIX
         private void MenuItemCallback(object sender, EventArgs e)
         {
             string message = string.Format(CultureInfo.CurrentCulture, "Inside {0}.MenuItemCallback()", this.GetType().FullName);
-            string title = "Command1";
-
+            string title = "Command1 " + this.GetType().FullName;
+    
             // Show a message box to prove we were here
             VsShellUtilities.ShowMessageBox(
                 this.ServiceProvider,
@@ -104,6 +114,12 @@ namespace TruffleVSIX
                 OLEMSGICON.OLEMSGICON_INFO,
                 OLEMSGBUTTON.OLEMSGBUTTON_OK,
                 OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
+        }
+
+        private void ShowAboutBoxCallback(object sender, EventArgs e)
+        {
+            AboutBox aboutBox = new AboutBox();
+            aboutBox.Show();
         }
     }
 }

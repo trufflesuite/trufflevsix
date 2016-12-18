@@ -50,6 +50,10 @@
       <Group guid="guidTrufflePackageCmdSet" id="MyMenuGroup" priority="0x0600">
         <Parent guid="guidTrufflePackageCmdSet" id="TopLevelMenu"/>
       </Group>
+
+      <Group guid="guidTrufflePackageCmdSet" id="AboutMenuGroup" priority="0x0700">
+        <Parent guid="guidTrufflePackageCmdSet" id="TopLevelMenu"/>
+      </Group>
     </Groups>
 
     <!--Buttons section. -->
@@ -63,11 +67,27 @@
               <CommandFlag>DefaultInvisible</CommandFlag>
               <CommandFlag>DynamicVisibility</CommandFlag>
           If you do not want an image next to your command, remove the Icon node /> -->
-      <Button guid="guidTrufflePackageCmdSet" id="TruffleId" priority="0x0100" type="Button">
+      <Button guid="guidTrufflePackageCmdSet" id="CompileId" priority="0x0100" type="Button">
         <Parent guid="guidTrufflePackageCmdSet" id="MyMenuGroup" />
         <Icon guid="guidImages" id="bmpPic1" />
         <Strings>
-          <ButtonText>Invoke Truffle</ButtonText>
+          <ButtonText>Compile</ButtonText>
+        </Strings>
+      </Button>
+
+      <Button guid="guidTrufflePackageCmdSet" id="MigrateId" priority="0x0110" type="Button">
+        <Parent guid="guidTrufflePackageCmdSet" id="MyMenuGroup" />
+        <Icon guid="guidImages" id="bmpPic1" />
+        <Strings>
+          <ButtonText>Migrate</ButtonText>
+        </Strings>
+      </Button>
+
+      <Button guid="guidTrufflePackageCmdSet" id="AboutId" priority="0x0900" type="Button">
+        <Parent guid="guidTrufflePackageCmdSet" id="AboutMenuGroup" />
+        <Icon guid="guidImages" id="bmpPic1" />
+        <Strings>
+          <ButtonText>About Truffle</ButtonText>
         </Strings>
       </Button>
     </Buttons>
@@ -92,7 +112,11 @@
       <!-- Following this: https://msdn.microsoft.com/en-us/library/bb165473.aspx -->
       <IDSymbol name="TopLevelMenu" value="0x1021"/>
       <IDSymbol name="MyMenuGroup" value="0x1020" />
-      <IDSymbol name="TruffleId" value="0x0100" />
+      <IDSymbol name="AboutMenuGroup" value="0x1019" />
+      <IDSymbol name="CompileId" value="0x0100" />
+      <IDSymbol name="MigrateId" value="0x0110" />
+
+      <IDSymbol name="AboutId" value="0x0900" />
     </GuidSymbol>
 
     <GuidSymbol name="guidImages" value="{27355964-dd36-48f2-831f-341799e65fee}" >
