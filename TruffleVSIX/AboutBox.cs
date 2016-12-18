@@ -14,15 +14,18 @@ namespace TruffleVSIX
         public AboutBox()
         {
             InitializeComponent();
-            this.Text = String.Format("About {0}", AssemblyTitle);
-            this.labelProductName.Text = "Truffle Visual Studio Extension";
-            this.labelVersion.Text = String.Format("Version {0}", AssemblyVersion);
-            this.labelCopyright.Text = "(c) Consensys LLC";
-            this.labelCompanyName.Text = AssemblyCompany;
-            this.textBoxDescription.Text = "Truffle is the most popular development framework for Ethereum. Find more at:"
+            this.Text = "";
+            this.textBoxDescription.Text = ""
+                 + "\r\n"
+                 + String.Format("Truffle Visual Studio Extension v{0}", AssemblyVersion)
+                 + "\r\n"
+                 + "\r\nTruffle is the most popular development framework for Ethereum. Find more at:"
                  + "\r\n"
                  + "\r\nOur Website:"
                  + "\r\n    http://truffleframework.com"
+                 + "\r\n"
+                 + "\r\nDocumentation:"
+                 + "\r\n    http://truffleframework.com/docs"
                  + "\r\n"
                  + "\r\nContribute:"
                  + "\r\n    http://github.com/Consensys/truffle"
@@ -114,5 +117,6 @@ namespace TruffleVSIX
         {
             Close();
         }
+
     }
 }
