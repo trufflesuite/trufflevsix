@@ -1,0 +1,4 @@
+C:\Users\tim\AppData\Local\Microsoft\VisualStudio\14.0Exp\Extensions\Tim Coulter\TruffleVSIX\1.0\\TruffleVSIX.dll
+C:\Users\tim\AppData\Local\Microsoft\VisualStudio\14.0Exp\Extensions\Tim Coulter\TruffleVSIX\1.0\\TruffleVSIX.pdb
+C:\Users\tim\AppData\Local\Microsoft\VisualStudio\14.0Exp\Extensions\Tim Coulter\TruffleVSIX\1.0\\TruffleVSIX.pkgdef
+C:\Users\tim\AppData\Local\Microsoft\VisualStudio\14.0Exp\Extensions\Tim Coulter\TruffleVSIX\1.0\\extension.vsixmanifest
