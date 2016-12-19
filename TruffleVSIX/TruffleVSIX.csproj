@@ -62,7 +62,6 @@
     </Compile>
     <Compile Include="Helpers\ProcessRunner.cs" />
     <Compile Include="ToolWindow.cs" />
-    <Compile Include="ToolWindowCommand.cs" />
     <Compile Include="ToolWindowControl.xaml.cs">
       <DependentUpon>ToolWindowControl.xaml</DependentUpon>
     </Compile>

@@ -69,7 +69,6 @@ namespace TruffleVSIX
         {
             TruffleMenu.Initialize(this);
             base.Initialize();
-            ToolWindowCommand.Initialize(this);
         }
 
         #endregion
