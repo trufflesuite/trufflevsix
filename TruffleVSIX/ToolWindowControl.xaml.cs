@@ -9,31 +9,48 @@ namespace TruffleVSIX
     using System.Diagnostics.CodeAnalysis;
     using System.Windows;
     using System.Windows.Controls;
-    using Helpers;
+
+    using EnvDTE;
+    using Microsoft.VisualStudio.Shell; 
+  
+
 
     /// <summary>
     /// Interaction logic for ToolWindow1Control.
     /// </summary>
-    public partial class ToolWindow1Control : UserControl
+    public partial class ToolWindowControl : UserControl
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="ToolWindow1Control"/> class.
+        /// Initializes a new instance of the <see cref="ToolWindowControl"/> class.
         /// </summary>
-        public ToolWindow1Control()
+        public ToolWindowControl()
         {
             this.InitializeComponent();
-
-            ProcessRunner runner = new ProcessRunner();
-
-            runner.OnLine += (line) =>
-            {
-                this.addText(line);
-            };
-
-            runner.run("pwd");
+            this.textBox.Text = "To use Truffle, open a Truffle project and then select actions from the Truffle menu above.";
         }
-        
-        private void addText(string str)
+
+        public void ClearText()
+        {
+            if (!Dispatcher.CheckAccess())
+            {
+                try
+                {
+                    Dispatcher.Invoke(() =>
+                    {
+                        this.textBox.Clear();
+                    }, System.Windows.Threading.DispatcherPriority.Input);
+                }
+                catch
+                {
+                    // This would fire when VS is closed. Not sure what to do here.
+                }
+            } else
+            {
+                this.textBox.Clear();
+            }
+        }
+
+        public void AddText(string str)
         {
             if (!Dispatcher.CheckAccess())
             {

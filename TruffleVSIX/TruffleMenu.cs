@@ -107,6 +107,8 @@ namespace TruffleVSIX
 
             IVsWindowFrame windowFrame = (IVsWindowFrame)window.Frame;
             Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(windowFrame.Show());
+
+            ((ToolWindow)window).RunCommand("ping 8.8.8.8");
         }
 
         /// <summary>
