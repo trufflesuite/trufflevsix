@@ -60,6 +60,7 @@
     <Compile Include="Controls\InterpolatedPictureBox.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Helpers\ProcessRunner.cs" />
     <Compile Include="ToolWindow1.cs" />
     <Compile Include="ToolWindow1Command.cs" />
     <Compile Include="ToolWindow1Control.xaml.cs">
