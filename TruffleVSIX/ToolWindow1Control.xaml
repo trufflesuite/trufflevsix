@@ -10,7 +10,7 @@
              Name="MyToolWindow">
     <Grid>
         <ScrollViewer Name="scrollViewer">
-            <TextBox x:Name="textBox" TextWrapping="Wrap" Text="TextBox" BorderBrush="Black" Background="Black" Foreground="White" FontFamily="Global Monospace" IsEnabled="False" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto"/>
+            <TextBox x:Name="textBox" TextWrapping="Wrap" BorderBrush="Black" Background="Black" Foreground="White" FontFamily="Global Monospace" IsEnabled="False" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto"/>
         </ScrollViewer>
     </Grid>
 </UserControl>
