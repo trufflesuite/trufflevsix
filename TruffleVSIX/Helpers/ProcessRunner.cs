@@ -11,10 +11,12 @@ namespace TruffleVSIX.Helpers
     class ProcessRunner
     {
         public delegate void LineHandler(string line);
+        public delegate void ErrorHandler(Exception e);
+
         public event LineHandler OnLine;
+        public event ErrorHandler OnError;
 
         private BackgroundWorker worker;
-        private LineHandler handler;
 
         public ProcessRunner()
         {
@@ -29,17 +31,24 @@ namespace TruffleVSIX.Helpers
 
         private void worker_DoWork(object sender, DoWorkEventArgs e)
         {
-            Process process = new Process();
-            process.StartInfo.FileName = "cmd.exe";
-            process.StartInfo.Arguments = "/C " + (string)e.Argument;
-            process.StartInfo.UseShellExecute = false;
-            process.StartInfo.RedirectStandardOutput = true;
-            process.StartInfo.CreateNoWindow = true;
-            process.OutputDataReceived += (s, args) => {
-                this.OnLine(args.Data + "\r\n");
-            };
-            process.Start();
-            process.BeginOutputReadLine();
+            try
+            {
+                Process process = new Process();
+                process.StartInfo.FileName = "cmd.exe";
+                process.StartInfo.Arguments = "/C " + (string)e.Argument;
+                process.StartInfo.UseShellExecute = false;
+                process.StartInfo.RedirectStandardOutput = true;
+                process.StartInfo.CreateNoWindow = true;
+                process.OutputDataReceived += (s, args) =>
+                {
+                    this.OnLine(args.Data + "\r\n");
+                };
+                process.Start();
+                process.BeginOutputReadLine();
+            } catch (Exception error)
+            {
+                this.OnError(error);
+            }
         }
 
 

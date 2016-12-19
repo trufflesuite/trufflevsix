@@ -96,19 +96,17 @@ namespace TruffleVSIX
 
         private void CompileCallback(object sender, EventArgs e)
         {
-            IVsOutputWindow outWindow = Package.GetGlobalService(typeof(SVsOutputWindow)) as IVsOutputWindow;
+            // Get the instance number 0 of this tool window. This window is single instance so this instance
+            // is actually the only one.
+            // The last flag is set to true so that if the tool window does not exists it will be created.
+            ToolWindowPane window = this.package.FindToolWindow(typeof(ToolWindow), 0, true);
+            if ((null == window) || (null == window.Frame))
+            {
+                throw new NotSupportedException("Cannot create tool window");
+            }
 
-            // Use e.g. Tools -> Create GUID to make a stable, but unique GUID for your pane.
-            // Also, in a real project, this should probably be a static constant, and not a local variable
-            Guid customGuid = new Guid("0F44E2D1-F5FA-4d2d-AB30-22BE8ECD9789");
-            string customTitle = "Custom Window Title";
-            outWindow.CreatePane(ref customGuid, customTitle, 1, 1);
-
-            IVsOutputWindowPane customPane;
-            outWindow.GetPane(ref customGuid, out customPane);
-
-            customPane.OutputString("Hello, Custom World!");
-            customPane.Activate(); // Brings this pane into view
+            IVsWindowFrame windowFrame = (IVsWindowFrame)window.Frame;
+            Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(windowFrame.Show());
         }
 
         /// <summary>

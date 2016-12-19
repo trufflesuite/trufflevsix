@@ -61,10 +61,10 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Helpers\ProcessRunner.cs" />
-    <Compile Include="ToolWindow1.cs" />
-    <Compile Include="ToolWindow1Command.cs" />
-    <Compile Include="ToolWindow1Control.xaml.cs">
-      <DependentUpon>ToolWindow1Control.xaml</DependentUpon>
+    <Compile Include="ToolWindow.cs" />
+    <Compile Include="ToolWindowCommand.cs" />
+    <Compile Include="ToolWindowControl.xaml.cs">
+      <DependentUpon>ToolWindowControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="TruffleMenu.cs" />
     <Compile Include="TrufflePackage.cs" />
@@ -213,7 +213,7 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <Page Include="ToolWindow1Control.xaml">
+    <Page Include="ToolWindowControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -40,7 +40,7 @@ namespace TruffleVSIX
     [ProvideMenuResource("Menus.ctmenu", 1)]
     [Guid(TrufflePackage.PackageGuidString)]
     [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1650:ElementDocumentationMustBeSpelledCorrectly", Justification = "pkgdef, VS and vsixmanifest are valid VS terms")]
-    [ProvideToolWindow(typeof(ToolWindow1))]
+    [ProvideToolWindow(typeof(ToolWindow))]
     public sealed class TrufflePackage : Package
     {
         /// <summary>
@@ -69,7 +69,7 @@ namespace TruffleVSIX
         {
             TruffleMenu.Initialize(this);
             base.Initialize();
-            ToolWindow1Command.Initialize(this);
+            ToolWindowCommand.Initialize(this);
         }
 
         #endregion
