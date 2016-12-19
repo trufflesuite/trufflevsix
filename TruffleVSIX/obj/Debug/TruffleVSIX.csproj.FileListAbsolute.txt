@@ -68,3 +68,7 @@ G:\workspace\VisualStudio\TruffleVSIX\TruffleVSIX\obj\Debug\TruffleVSIX.latest.p
 G:\workspace\VisualStudio\TruffleVSIX\TruffleVSIX\obj\Debug\extension.vsixmanifest
 G:\workspace\VisualStudio\TruffleVSIX\TruffleVSIX\obj\Debug\TruffleVSIX.csprojResolveAssemblyReference.cache
 G:\workspace\VisualStudio\TruffleVSIX\TruffleVSIX\obj\Debug\TruffleVSIX.AboutBox.resources
+G:\workspace\VisualStudio\TruffleVSIX\TruffleVSIX\obj\Debug\ToolWindow1Control.baml
+G:\workspace\VisualStudio\TruffleVSIX\TruffleVSIX\obj\Debug\ToolWindow1Control.g.cs
+G:\workspace\VisualStudio\TruffleVSIX\TruffleVSIX\obj\Debug\TruffleVSIX_MarkupCompile.cache
+G:\workspace\VisualStudio\TruffleVSIX\TruffleVSIX\obj\Debug\TruffleVSIX.g.resources

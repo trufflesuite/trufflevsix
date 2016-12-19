@@ -15,10 +15,10 @@
         defining some of the constants that we will use inside the file. -->
 
   <!--This is the file that defines the IDs for all the commands exposed by VisualStudio. -->
-  <Extern href="stdidcmd.h"/>
+  <Extern href="stdidcmd.h" />
 
   <!--This header contains the command ids for the menus provided by the shell. -->
-  <Extern href="vsshlids.h"/>
+  <Extern href="vsshlids.h" />
 
   <!--The Commands section is where commands, menus, and menu groups are defined.
       This section uses a Guid to identify the package that provides the command defined inside it. -->
@@ -48,11 +48,11 @@
          must be a menu. -->
     <Groups>
       <Group guid="guidTrufflePackageCmdSet" id="MyMenuGroup" priority="0x0600">
-        <Parent guid="guidTrufflePackageCmdSet" id="TopLevelMenu"/>
+        <Parent guid="guidTrufflePackageCmdSet" id="TopLevelMenu" />
       </Group>
 
       <Group guid="guidTrufflePackageCmdSet" id="AboutMenuGroup" priority="0x0700">
-        <Parent guid="guidTrufflePackageCmdSet" id="TopLevelMenu"/>
+        <Parent guid="guidTrufflePackageCmdSet" id="TopLevelMenu" />
       </Group>
     </Groups>
 
@@ -90,6 +90,13 @@
           <ButtonText>About Truffle</ButtonText>
         </Strings>
       </Button>
+      <Button guid="guidTrufflePackageCmdSet" id="cmdidToolWindow1Command" priority="0x0901" type="Button">
+        <Parent guid="guidTrufflePackageCmdSet" id="AboutMenuGroup" />
+        <Icon guid="guidImages1" id="bmpPic1" />
+        <Strings>
+          <ButtonText>ToolWindow1</ButtonText>
+        </Strings>
+      </Button>
     </Buttons>
 
     <!--The bitmaps section is used to define the bitmaps that are used for the commands.-->
@@ -99,7 +106,8 @@
             bitmap strip containing the bitmaps and then there are the numeric ids of the elements used
             inside a button definition. An important aspect of this declaration is that the element id
             must be the actual index (1-based) of the bitmap inside the bitmap strip. -->
-      <Bitmap guid="guidImages" href="Resources\Truffle.png" usedList="bmpPic1, bmpPic2, bmpPicSearch, bmpPicX, bmpPicArrows, bmpPicStrikethrough"/>
+      <Bitmap guid="guidImages" href="Resources\Truffle.png" usedList="bmpPic1, bmpPic2, bmpPicSearch, bmpPicX, bmpPicArrows, bmpPicStrikethrough" />
+      <Bitmap guid="guidImages1" href="Resources\ToolWindow1Command.png" usedList="bmpPic1, bmpPic2, bmpPicSearch, bmpPicX, bmpPicArrows, bmpPicStrikethrough" />
     </Bitmaps>
   </Commands>
 
@@ -110,16 +118,17 @@
     <!-- This is the guid used to group the menu commands together -->
     <GuidSymbol name="guidTrufflePackageCmdSet" value="{41aca4e2-e75b-4335-8072-294f3bd9ac04}">
       <!-- Following this: https://msdn.microsoft.com/en-us/library/bb165473.aspx -->
-      <IDSymbol name="TopLevelMenu" value="0x1021"/>
+      <IDSymbol name="TopLevelMenu" value="0x1021" />
       <IDSymbol name="MyMenuGroup" value="0x1020" />
       <IDSymbol name="AboutMenuGroup" value="0x1019" />
       <IDSymbol name="CompileId" value="0x0100" />
       <IDSymbol name="MigrateId" value="0x0110" />
 
       <IDSymbol name="AboutId" value="0x0900" />
+      <IDSymbol value="4130" name="cmdidToolWindow1Command" />
     </GuidSymbol>
 
-    <GuidSymbol name="guidImages" value="{27355964-dd36-48f2-831f-341799e65fee}" >
+    <GuidSymbol name="guidImages" value="{27355964-dd36-48f2-831f-341799e65fee}">
       <IDSymbol name="bmpPic1" value="1" />
       <IDSymbol name="bmpPic2" value="2" />
       <IDSymbol name="bmpPicSearch" value="3" />
@@ -128,5 +137,14 @@
       <IDSymbol name="bmpPicStrikethrough" value="6" />
     </GuidSymbol>
 
+  
+    <GuidSymbol value="{6d397d82-4200-40ba-bff9-a5170ad6905a}" name="guidImages1">
+      <IDSymbol name="bmpPic1" value="1" />
+      <IDSymbol name="bmpPic2" value="2" />
+      <IDSymbol name="bmpPicSearch" value="3" />
+      <IDSymbol name="bmpPicX" value="4" />
+      <IDSymbol name="bmpPicArrows" value="5" />
+      <IDSymbol name="bmpPicStrikethrough" value="6" />
+    </GuidSymbol>
   </Symbols>
 </CommandTable>

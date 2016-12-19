@@ -48,7 +48,7 @@ namespace TruffleVSIX
 
             this.package = package;
 
-            this.addCommand(CompileCommandId, this.MenuItemCallback);
+            this.addCommand(CompileCommandId, this.CompileCallback);
             this.addCommand(MigrateCommandId, this.MenuItemCallback);
             this.addCommand(AboutCommandId, this.ShowAboutBoxCallback);
         }
@@ -92,6 +92,23 @@ namespace TruffleVSIX
         public static void Initialize(Package package)
         {
             Instance = new TruffleMenu(package);
+        }
+
+        private void CompileCallback(object sender, EventArgs e)
+        {
+            IVsOutputWindow outWindow = Package.GetGlobalService(typeof(SVsOutputWindow)) as IVsOutputWindow;
+
+            // Use e.g. Tools -> Create GUID to make a stable, but unique GUID for your pane.
+            // Also, in a real project, this should probably be a static constant, and not a local variable
+            Guid customGuid = new Guid("0F44E2D1-F5FA-4d2d-AB30-22BE8ECD9789");
+            string customTitle = "Custom Window Title";
+            outWindow.CreatePane(ref customGuid, customTitle, 1, 1);
+
+            IVsOutputWindowPane customPane;
+            outWindow.GetPane(ref customGuid, out customPane);
+
+            customPane.OutputString("Hello, Custom World!");
+            customPane.Activate(); // Brings this pane into view
         }
 
         /// <summary>
