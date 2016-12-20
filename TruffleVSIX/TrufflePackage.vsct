@@ -70,6 +70,8 @@
       <Button guid="guidTrufflePackageCmdSet" id="CompileId" priority="0x0100" type="Button">
         <Parent guid="guidTrufflePackageCmdSet" id="MyMenuGroup" />
         <Icon guid="guidImages" id="bmpPic1" />
+        <CommandFlag>DefaultInvisible</CommandFlag>
+        <CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
           <ButtonText>Compile</ButtonText>
         </Strings>
@@ -77,7 +79,9 @@
 
       <Button guid="guidTrufflePackageCmdSet" id="MigrateId" priority="0x0110" type="Button">
         <Parent guid="guidTrufflePackageCmdSet" id="MyMenuGroup" />
+        <CommandFlag>DefaultInvisible</CommandFlag>
         <Icon guid="guidImages" id="bmpPic1" />
+        <CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
           <ButtonText>Migrate</ButtonText>
         </Strings>
@@ -86,6 +90,8 @@
       <Button guid="guidTrufflePackageCmdSet" id="AboutId" priority="0x0900" type="Button">
         <Parent guid="guidTrufflePackageCmdSet" id="AboutMenuGroup" />
         <Icon guid="guidImages" id="bmpPic1" />
+        <CommandFlag>DefaultInvisible</CommandFlag>
+        <CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
           <ButtonText>About Truffle</ButtonText>
         </Strings>

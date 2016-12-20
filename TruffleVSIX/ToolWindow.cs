@@ -11,6 +11,8 @@ namespace TruffleVSIX
     using Microsoft.VisualStudio.Shell;
     using Helpers;
 
+    using EnvDTE;
+
     /// <summary>
     /// This class implements the tool window exposed by this package and hosts a user control.
     /// </summary>
@@ -54,12 +56,6 @@ namespace TruffleVSIX
             control.ClearText();
 
             this.runner.Run(command);
-
-            //DTE2 dte2 = Package.GetGlobalService(typeof(DTE)) as DTE2;
-            //DTE dte = (DTE)Package.GetGlobalService(typeof(DTE));
-            ///string solutionDir = System.IO.Path.GetDirectoryName(dte.Solution.FullName);
-
-            //this.addText(solutionDir);
         }
 
     }

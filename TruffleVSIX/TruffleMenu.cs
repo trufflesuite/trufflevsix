@@ -7,6 +7,7 @@
 using System;
 using System.ComponentModel.Design;
 using System.Globalization;
+using System.Collections.Generic;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 
@@ -34,6 +35,9 @@ namespace TruffleVSIX
         /// </summary>
         private readonly Package package;
 
+        private List<OleMenuCommand> allMenuItems = new List<OleMenuCommand>();
+        private List<OleMenuCommand> projectOnlyMenuItems = new List<OleMenuCommand>();
+
         /// <summary>
         /// Initializes a new instance of the <see cref="TruffleMenu"/> class.
         /// Adds our command handlers for menu (commands must exist in the command table file)
@@ -50,17 +54,56 @@ namespace TruffleVSIX
 
             this.addCommand(CompileCommandId, this.CompileCallback);
             this.addCommand(MigrateCommandId, this.MenuItemCallback);
-            this.addCommand(AboutCommandId, this.ShowAboutBoxCallback);
+            this.addCommand(AboutCommandId, this.ShowAboutBoxCallback, false);
+
+            ((TrufflePackage)this.package).OnOpen += () =>
+            {
+                bool truffleInstalled = ((TrufflePackage)this.package).TruffleInstalled;
+
+                allMenuItems.ForEach(delegate (OleMenuCommand menuItem)
+                {
+                    menuItem.Visible = true;
+                });
+
+                if (truffleInstalled == true)
+                {
+                    projectOnlyMenuItems.ForEach(delegate (OleMenuCommand menuItem)
+                    {
+                        menuItem.Enabled = true;
+                    });
+                }
+            };
+
+            ((TrufflePackage)this.package).OnClose += () =>
+            {
+                allMenuItems.ForEach(delegate (OleMenuCommand menuItem)
+                {
+                    menuItem.Visible = false;
+                });
+
+                projectOnlyMenuItems.ForEach(delegate (OleMenuCommand menuItem)
+                {
+                    menuItem.Enabled = false;
+                });
+            };
         }
 
-        public void addCommand(int commandId, EventHandler handler)
+        public void addCommand(int commandId, EventHandler handler, bool projectOnly = true)
         {
             OleMenuCommandService commandService = this.ServiceProvider.GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
 
             if (commandService != null)
             {
                 var menuCommandID = new CommandID(CommandSet, commandId);
-                var menuItem = new MenuCommand(handler, menuCommandID);
+                var menuItem = new OleMenuCommand(handler, menuCommandID);
+
+                if (projectOnly == true)
+                {
+                    projectOnlyMenuItems.Add(menuItem);
+                }
+
+                allMenuItems.Add(menuItem);
+
                 commandService.AddCommand(menuItem);
             }
         }
@@ -92,6 +135,13 @@ namespace TruffleVSIX
         public static void Initialize(Package package)
         {
             Instance = new TruffleMenu(package);
+        }
+
+
+        private void BeforeQueryStatusCallback(object sender, EventArgs e)
+        {
+            var cmd = (OleMenuCommand)sender;
+            cmd.Enabled = ((TrufflePackage)this.package).InSolution;
         }
 
         private void CompileCallback(object sender, EventArgs e)

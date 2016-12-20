@@ -15,6 +15,8 @@ using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.Win32;
+using EnvDTE;
+using System.IO;
 
 namespace TruffleVSIX
 {
@@ -41,6 +43,7 @@ namespace TruffleVSIX
     [Guid(TrufflePackage.PackageGuidString)]
     [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1650:ElementDocumentationMustBeSpelledCorrectly", Justification = "pkgdef, VS and vsixmanifest are valid VS terms")]
     [ProvideToolWindow(typeof(ToolWindow))]
+    [ProvideAutoLoad(Microsoft.VisualStudio.Shell.Interop.UIContextGuids.SolutionExists)] // Not sure which one to use, this one seems faster than SolutionExists
     public sealed class TrufflePackage : Package
     {
         /// <summary>
@@ -61,6 +64,19 @@ namespace TruffleVSIX
 
         #region Package Members
 
+        private DTE _dte;
+        private SolutionEvents _solutionEvents;
+        public bool InSolution { get; private set; }
+        public bool TruffleInstalled { get; private set; }
+        public string SolutionPath { get; private set; }
+        public string TrufflePath { get; private set; }
+
+        public delegate void OpenHandler();
+        public event OpenHandler OnOpen;
+
+        public delegate void CloseHandler();
+        public event CloseHandler OnClose;
+
         /// <summary>
         /// Initialization of the package; this method is called right after the package is sited, so this is the place
         /// where you can put all the initialization code that rely on services provided by VisualStudio.
@@ -69,6 +85,49 @@ namespace TruffleVSIX
         {
             TruffleMenu.Initialize(this);
             base.Initialize();
+
+            // Documentation says this is Microsoft Interal Use Only.
+            // How else do we determine the solution that's opened?
+            this._dte = (DTE)this.GetService(typeof(DTE));
+            this._solutionEvents = ((Events)this._dte.Events).SolutionEvents;
+            this._solutionEvents.Opened += SolutionOpened;
+            this._solutionEvents.AfterClosing += SolutionClosed;
+
+            // Set all variables as not in a solution initially.
+            SolutionClosed();
+        }
+
+        private void SolutionOpened()
+        {
+            string solutionDir;
+
+            try
+            {
+                DTE dte = (DTE)Microsoft.VisualStudio.Shell.Package.GetGlobalService(typeof(DTE));
+                solutionDir = System.IO.Path.GetDirectoryName(dte.Solution.FullName);
+            } catch
+            {
+                // Nothing we can do here if this errors. Don't go on.
+                return;
+            }
+
+            this.InSolution = true;
+            this.SolutionPath = solutionDir;
+
+            this.TrufflePath = Path.Combine(new string [] {this.SolutionPath, "node_modules", ".bin", "truffle"});
+            this.TruffleInstalled = File.Exists(this.TrufflePath);
+
+            this.OnOpen();
+        }
+
+        private void SolutionClosed()
+        {
+            this.InSolution = false;
+            this.TruffleInstalled = false;
+            this.SolutionPath = "";
+            this.TrufflePath = "";
+
+            this.OnClose();
         }
 
         #endregion

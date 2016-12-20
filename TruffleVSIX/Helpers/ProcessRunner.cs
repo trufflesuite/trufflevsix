@@ -9,8 +9,6 @@ using System.Management;
 
 namespace TruffleVSIX.Helpers
 {
-
-
     class ProcessRunner
     {
         public delegate void LineHandler(string line);
