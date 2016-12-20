@@ -69,6 +69,7 @@ namespace TruffleVSIX
         public bool InSolution { get; private set; }
         public bool TruffleInstalled { get; private set; }
         public string SolutionPath { get; private set; }
+        public string ProjectPath { get; private set; }
         public string TrufflePath { get; private set; }
 
         public delegate void OpenHandler();
@@ -99,12 +100,14 @@ namespace TruffleVSIX
 
         private void SolutionOpened()
         {
-            string solutionDir;
+            string solutionPath;
+            Projects projects;
 
             try
             {
                 DTE dte = (DTE)Microsoft.VisualStudio.Shell.Package.GetGlobalService(typeof(DTE));
-                solutionDir = System.IO.Path.GetDirectoryName(dte.Solution.FullName);
+                projects = dte.Solution.Projects;
+                solutionPath = Path.GetDirectoryName(dte.Solution.FullName);
             } catch
             {
                 // Nothing we can do here if this errors. Don't go on.
@@ -112,10 +115,23 @@ namespace TruffleVSIX
             }
 
             this.InSolution = true;
-            this.SolutionPath = solutionDir;
+            this.SolutionPath = solutionPath;
 
-            this.TrufflePath = Path.Combine(new string [] {this.SolutionPath, "node_modules", ".bin", "truffle"});
-            this.TruffleInstalled = File.Exists(this.TrufflePath);
+            // Use the first Truffle project we find
+            // TODO: Somehow support multiple projects
+            foreach (Project project in projects)
+            {
+                string projectPath = Path.GetDirectoryName(project.FullName);
+                string expectedTruffleBin = Path.Combine(new string[] {projectPath, "node_modules", ".bin", "truffle" });
+
+                if (File.Exists(expectedTruffleBin) == true)
+                {
+                    this.ProjectPath = projectPath;
+                    this.TruffleInstalled = true;
+                    this.TrufflePath = expectedTruffleBin;
+                    break;
+                }
+            }
 
             this.OnOpen();
         }

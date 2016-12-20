@@ -55,7 +55,14 @@ namespace TruffleVSIX
             ToolWindowControl control = (ToolWindowControl)this.Content;
             control.ClearText();
 
+            //control.AddText(command);
             this.runner.Run(command);
+        }
+
+        public void RunTruffleCommand(string command)
+        {
+            TrufflePackage trufflePackage = (TrufflePackage)this.Package;
+            this.RunCommand(trufflePackage.TrufflePath + " " + command + " --working-directory " + trufflePackage.ProjectPath);
         }
 
     }
