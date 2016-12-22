@@ -47,11 +47,23 @@
          group as the part of a menu contained between two lines. The parent of a group
          must be a menu. -->
     <Groups>
-      <Group guid="guidTrufflePackageCmdSet" id="MyMenuGroup" priority="0x0600">
+      <Group guid="guidTrufflePackageCmdSet" id="ProjectMenuGroup" priority="0x0100">
         <Parent guid="guidTrufflePackageCmdSet" id="TopLevelMenu" />
       </Group>
 
-      <Group guid="guidTrufflePackageCmdSet" id="AboutMenuGroup" priority="0x0700">
+      <Group guid="guidTrufflePackageCmdSet" id="InitializeMenuGroup" priority="0x0150">
+        <Parent guid="guidTrufflePackageCmdSet" id="TopLevelMenu" />
+      </Group>
+      
+      <Group guid="guidTrufflePackageCmdSet" id="TestRPCMenuGroup" priority="0x0200">
+        <Parent guid="guidTrufflePackageCmdSet" id="TopLevelMenu" />
+      </Group>
+
+      <Group guid="guidTrufflePackageCmdSet" id="InstallMenuGroup" priority="0x0300">
+        <Parent guid="guidTrufflePackageCmdSet" id="TopLevelMenu" />
+      </Group>
+
+      <Group guid="guidTrufflePackageCmdSet" id="AboutMenuGroup" priority="0x0800">
         <Parent guid="guidTrufflePackageCmdSet" id="TopLevelMenu" />
       </Group>
     </Groups>
@@ -67,9 +79,11 @@
               <CommandFlag>DefaultInvisible</CommandFlag>
               <CommandFlag>DynamicVisibility</CommandFlag>
           If you do not want an image next to your command, remove the Icon node /> -->
+
+      <!-- Project -->
       <Button guid="guidTrufflePackageCmdSet" id="CompileId" priority="0x0100" type="Button">
-        <Parent guid="guidTrufflePackageCmdSet" id="MyMenuGroup" />
-        <Icon guid="guidImages" id="bmpPic1" />
+        <Parent guid="guidTrufflePackageCmdSet" id="ProjectMenuGroup" />
+        <!--Icon guid="guidImages" id="bmpPic1" /-->
         <CommandFlag>DefaultInvisible</CommandFlag>
         <CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
@@ -78,18 +92,83 @@
       </Button>
 
       <Button guid="guidTrufflePackageCmdSet" id="MigrateId" priority="0x0110" type="Button">
-        <Parent guid="guidTrufflePackageCmdSet" id="MyMenuGroup" />
+        <Parent guid="guidTrufflePackageCmdSet" id="ProjectMenuGroup" />
         <CommandFlag>DefaultInvisible</CommandFlag>
-        <Icon guid="guidImages" id="bmpPic1" />
+        <!--Icon guid="guidImages" id="bmpPic1" /-->
         <CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
           <ButtonText>Migrate</ButtonText>
         </Strings>
       </Button>
 
+      <Button guid="guidTrufflePackageCmdSet" id="TestId" priority="0x0120" type="Button">
+        <Parent guid="guidTrufflePackageCmdSet" id="ProjectMenuGroup" />
+        <CommandFlag>DefaultInvisible</CommandFlag>
+        <!--Icon guid="guidImages" id="bmpPic1" /-->
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <Strings>
+          <ButtonText>Run Tests</ButtonText>
+        </Strings>
+      </Button>
+      
+      <!-- Initialize -->
+
+      <Button guid="guidTrufflePackageCmdSet" id="InitializeProjectId" priority="0x0150" type="Button">
+        <Parent guid="guidTrufflePackageCmdSet" id="InitializeMenuGroup" />
+        <CommandFlag>DefaultInvisible</CommandFlag>
+        <!--Icon guid="guidImages" id="bmpPic1" /-->
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <Strings>
+          <ButtonText>Initialize Project...</ButtonText>
+        </Strings>
+      </Button>
+      
+      <!-- TestRPC -->
+      <Button guid="guidTrufflePackageCmdSet" id="StartTestRPCId" priority="0x0200" type="Button">
+        <Parent guid="guidTrufflePackageCmdSet" id="TestRPCMenuGroup" />
+        <!--Icon guid="guidImages" id="bmpPic1" /-->
+        <CommandFlag>DefaultInvisible</CommandFlag>
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <Strings>
+          <ButtonText>Start TestRPC...</ButtonText>
+        </Strings>
+      </Button>
+
+      <Button guid="guidTrufflePackageCmdSet" id="StopTestRPCId" priority="0x0210" type="Button">
+        <Parent guid="guidTrufflePackageCmdSet" id="TestRPCMenuGroup" />
+        <Icon guid="guidImages" id="bmpPicX" />
+        <CommandFlag>DefaultInvisible</CommandFlag>
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <Strings>
+          <ButtonText>Stop TestRPC</ButtonText>
+        </Strings>
+      </Button>
+
+      <!-- Install -->
+      <Button guid="guidTrufflePackageCmdSet" id="InstallTruffleId" priority="0x0800" type="Button">
+        <Parent guid="guidTrufflePackageCmdSet" id="InstallMenuGroup" />
+        <!--Icon guid="guidImages" id="bmpPic1" /-->
+        <CommandFlag>DefaultInvisible</CommandFlag>
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <Strings>
+          <ButtonText>Install Truffle...</ButtonText>
+        </Strings>
+      </Button>
+
+      <Button guid="guidTrufflePackageCmdSet" id="InstallTestRPCId" priority="0x0800" type="Button">
+        <Parent guid="guidTrufflePackageCmdSet" id="InstallMenuGroup" />
+        <!--Icon guid="guidImages" id="bmpPic1" /-->
+        <CommandFlag>DefaultInvisible</CommandFlag>
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <Strings>
+          <ButtonText>Install TestRPC...</ButtonText>
+        </Strings>
+      </Button>
+
+      <!-- About -->
       <Button guid="guidTrufflePackageCmdSet" id="AboutId" priority="0x0900" type="Button">
         <Parent guid="guidTrufflePackageCmdSet" id="AboutMenuGroup" />
-        <Icon guid="guidImages" id="bmpPic1" />
+        <Icon guid="ballIcon" id="ball" />
         <CommandFlag>DefaultInvisible</CommandFlag>
         <CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
@@ -106,6 +185,7 @@
             inside a button definition. An important aspect of this declaration is that the element id
             must be the actual index (1-based) of the bitmap inside the bitmap strip. -->
       <Bitmap guid="guidImages" href="Resources\Truffle.png" usedList="bmpPic1, bmpPic2, bmpPicSearch, bmpPicX, bmpPicArrows, bmpPicStrikethrough" />
+      <Bitmap guid="ballIcon" href="Resources\ball-16x16.png" usedList="ball" />
     </Bitmaps>
   </Commands>
 
@@ -117,11 +197,24 @@
     <GuidSymbol name="guidTrufflePackageCmdSet" value="{41aca4e2-e75b-4335-8072-294f3bd9ac04}">
       <!-- Following this: https://msdn.microsoft.com/en-us/library/bb165473.aspx -->
       <IDSymbol name="TopLevelMenu" value="0x1021" />
-      <IDSymbol name="MyMenuGroup" value="0x1020" />
-      <IDSymbol name="AboutMenuGroup" value="0x1019" />
+      <IDSymbol name="ProjectMenuGroup" value="0x1020" />
+      <IDSymbol name="InitializeMenuGroup" value="0x1019"/>
+      <IDSymbol name="TestRPCMenuGroup" value="0x1018" />
+      <IDSymbol name="InstallMenuGroup" value="0x1017" />
+      <IDSymbol name="AboutMenuGroup" value="0x1010" />
+      
       <IDSymbol name="CompileId" value="0x0100" />
       <IDSymbol name="MigrateId" value="0x0110" />
+      <IDSymbol name="TestId" value="0x0120" />
+      <IDSymbol name="InitializeProjectId" value="0x0150" />
 
+      <IDSymbol name="InstallTruffleId" value="0x0800"/>
+      <IDSymbol name="InstallTestRPCId" value="0x0850"/>
+
+      <IDSymbol name="InstallTruffleId" value="0x0800"/>
+      <IDSymbol name="StartTestRPCId" value="0x0855"/>
+      <IDSymbol name="StopTestRPCId" value="0x0860"/>
+      
       <IDSymbol name="AboutId" value="0x0900" />
     </GuidSymbol>
 
@@ -134,14 +227,8 @@
       <IDSymbol name="bmpPicStrikethrough" value="6" />
     </GuidSymbol>
 
-  
-    <GuidSymbol value="{6d397d82-4200-40ba-bff9-a5170ad6905a}" name="guidImages1">
-      <IDSymbol name="bmpPic1" value="1" />
-      <IDSymbol name="bmpPic2" value="2" />
-      <IDSymbol name="bmpPicSearch" value="3" />
-      <IDSymbol name="bmpPicX" value="4" />
-      <IDSymbol name="bmpPicArrows" value="5" />
-      <IDSymbol name="bmpPicStrikethrough" value="6" />
+    <GuidSymbol name="ballIcon" value="{8CC691F1-9BF6-46B9-90E7-5B4239FD148D}">
+      <IDSymbol name="ball" value="1" />
     </GuidSymbol>
   </Symbols>
 </CommandTable>

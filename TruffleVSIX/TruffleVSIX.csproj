@@ -60,11 +60,9 @@
     <Compile Include="Controls\InterpolatedPictureBox.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Helpers\OutputPane.cs" />
+    <Compile Include="Helpers\TruffleENV.cs" />
     <Compile Include="Helpers\ProcessRunner.cs" />
-    <Compile Include="ToolWindow.cs" />
-    <Compile Include="ToolWindowControl.xaml.cs">
-      <DependentUpon>ToolWindowControl.xaml</DependentUpon>
-    </Compile>
     <Compile Include="TruffleMenu.cs" />
     <Compile Include="TrufflePackage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -86,6 +84,7 @@
       <ResourceName>Menus.ctmenu</ResourceName>
     </VSCTCompile>
     <Content Include="index.html" />
+    <Content Include="Resources\ball-16x16.png" />
     <Content Include="Resources\logo.png" />
     <Content Include="Resources\ToolWindow1Command.png" />
     <Content Include="Resources\Truffle.png" />
@@ -211,12 +210,6 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>VSPackage.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <Page Include="ToolWindowControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(VSToolsPath)\VSSDK\Microsoft.VsSDK.targets" Condition="'$(VSToolsPath)' != ''" />

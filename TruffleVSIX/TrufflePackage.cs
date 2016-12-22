@@ -17,6 +17,8 @@ using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.Win32;
 using EnvDTE;
 using System.IO;
+using TruffleVSIX.Helpers;
+using System.Text.RegularExpressions;
 
 namespace TruffleVSIX
 {
@@ -42,8 +44,7 @@ namespace TruffleVSIX
     [ProvideMenuResource("Menus.ctmenu", 1)]
     [Guid(TrufflePackage.PackageGuidString)]
     [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1650:ElementDocumentationMustBeSpelledCorrectly", Justification = "pkgdef, VS and vsixmanifest are valid VS terms")]
-    [ProvideToolWindow(typeof(ToolWindow))]
-    [ProvideAutoLoad(Microsoft.VisualStudio.Shell.Interop.UIContextGuids.SolutionExists)] // Not sure which one to use, this one seems faster than SolutionExists
+    [ProvideAutoLoad(Microsoft.VisualStudio.Shell.Interop.UIContextGuids.SolutionHasSingleProject)] // Not sure which one to use, this one seems faster than SolutionExists
     public sealed class TrufflePackage : Package
     {
         /// <summary>
@@ -68,15 +69,22 @@ namespace TruffleVSIX
         private SolutionEvents _solutionEvents;
         public bool InSolution { get; private set; }
         public bool TruffleInstalled { get; private set; }
+        public bool TestRPCInstalled { get; private set; }
+        public bool NPMInstalled { get; private set; }
         public string SolutionPath { get; private set; }
         public string ProjectPath { get; private set; }
         public string TrufflePath { get; private set; }
+        public bool TruffleProjectInitialized { get; private set; }
+
+        public OutputPane TrufflePane { get; private set; }
+        public OutputPane TestRPCPane { get; private set; }
 
         public delegate void OpenHandler();
         public event OpenHandler OnOpen;
 
         public delegate void CloseHandler();
         public event CloseHandler OnClose;
+
 
         /// <summary>
         /// Initialization of the package; this method is called right after the package is sited, so this is the place
@@ -87,6 +95,9 @@ namespace TruffleVSIX
             TruffleMenu.Initialize(this);
             base.Initialize();
 
+            this.TrufflePane = new OutputPane(this, "Truffle");
+            this.TestRPCPane = new OutputPane(this, "TestRPC");
+
             // Documentation says this is Microsoft Interal Use Only.
             // How else do we determine the solution that's opened?
             this._dte = (DTE)this.GetService(typeof(DTE));
@@ -94,8 +105,19 @@ namespace TruffleVSIX
             this._solutionEvents.Opened += SolutionOpened;
             this._solutionEvents.AfterClosing += SolutionClosed;
 
+            TestRPCPane.runner.OnStart += () =>
+            {
+                this.RecheckEnvironment();
+            };
+
             // Set all variables as not in a solution initially.
             SolutionClosed();
+        }
+
+        // This is hacky.
+        public void RecheckEnvironment()
+        {
+            this.SolutionOpened();
         }
 
         private void SolutionOpened()
@@ -122,16 +144,24 @@ namespace TruffleVSIX
             foreach (Project project in projects)
             {
                 string projectPath = Path.GetDirectoryName(project.FullName);
-                string expectedTruffleBin = Path.Combine(new string[] {projectPath, "node_modules", ".bin", "truffle" });
 
-                if (File.Exists(expectedTruffleBin) == true)
+                // If no project path is specified, let's at least set the first one.
+                if (this.ProjectPath == null)
+                {
+                    this.ProjectPath = projectPath;
+                }
+
+                if (TruffleENV.CheckTruffleInstalled(projectPath) == true)
                 {
                     this.ProjectPath = projectPath;
                     this.TruffleInstalled = true;
-                    this.TrufflePath = expectedTruffleBin;
+                    this.TrufflePath = TruffleENV.ExpectedTruffleBinary(projectPath);
                     break;
                 }
             }
+
+            this.TestRPCInstalled = TruffleENV.CheckTestRPCInstalled(this.ProjectPath);
+            this.TruffleProjectInitialized = TruffleENV.CheckTruffleProjectInitialized(this.ProjectPath);
 
             this.OnOpen();
         }
@@ -140,10 +170,25 @@ namespace TruffleVSIX
         {
             this.InSolution = false;
             this.TruffleInstalled = false;
-            this.SolutionPath = "";
-            this.TrufflePath = "";
+            this.NPMInstalled = false;
+            this.SolutionPath = null;
+            this.ProjectPath = null;
+            this.TrufflePath = null;
+
+            TrufflePane.Kill();
+            TestRPCPane.Kill();
 
             this.OnClose();
+        }
+
+        public object GetServicePublic(Type serviceType)
+        {
+            return this.GetService(serviceType);
+        }
+
+        public bool CheckTestRPCRunning()
+        {
+            return TestRPCPane.IsRunning();
         }
 
         #endregion

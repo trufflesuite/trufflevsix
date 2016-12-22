@@ -10,6 +10,7 @@ using System.Globalization;
 using System.Collections.Generic;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
+using TruffleVSIX.Helpers;
 
 namespace TruffleVSIX
 {
@@ -23,6 +24,15 @@ namespace TruffleVSIX
         /// </summary>
         public const int CompileCommandId = 0x0100;
         public const int MigrateCommandId = 0x0110;
+        public const int TestCommandId = 0x0120;
+        public const int InitializeProjectId = 0x0150;
+
+        public const int InstallTruffleId = 0x0800;
+        public const int InstallTestRPCId = 0x0850;
+
+        public const int StartTestRPCId = 0x0855;
+        public const int StopTestRPCId = 0x0860;
+
         public const int AboutCommandId   = 0x0900;
 
         /// <summary>
@@ -33,10 +43,20 @@ namespace TruffleVSIX
         /// <summary>
         /// VS Package that provides this command, not null.
         /// </summary>
-        private readonly Package package;
+        private readonly TrufflePackage package;
 
         private List<OleMenuCommand> allMenuItems = new List<OleMenuCommand>();
         private List<OleMenuCommand> projectOnlyMenuItems = new List<OleMenuCommand>();
+
+        OleMenuCommand compile;
+        OleMenuCommand migrate;
+        OleMenuCommand test;
+        OleMenuCommand initializeProject;
+        OleMenuCommand installTruffle;
+        OleMenuCommand installTestRPC;
+        OleMenuCommand startTestRPC;
+        OleMenuCommand stopTestRPC;
+        OleMenuCommand about;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TruffleMenu"/> class.
@@ -50,45 +70,32 @@ namespace TruffleVSIX
                 throw new ArgumentNullException("package");
             }
 
-            this.package = package;
+            this.package = (TrufflePackage)package;
 
-            this.addCommand(CompileCommandId, this.CompileCallback);
-            this.addCommand(MigrateCommandId, this.MenuItemCallback);
-            this.addCommand(AboutCommandId, this.ShowAboutBoxCallback, false);
+            compile = this.createMenuItem(CompileCommandId, this.CompileCallback);
+            migrate = this.createMenuItem(MigrateCommandId, this.MigrateCallback);
+            test = this.createMenuItem(TestCommandId, this.TestCallback);
 
-            ((TrufflePackage)this.package).OnOpen += () =>
-            {
-                bool truffleInstalled = ((TrufflePackage)this.package).TruffleInstalled;
+            initializeProject = this.createMenuItem(InitializeProjectId, this.InitializeProjectCallback);
 
-                allMenuItems.ForEach(delegate (OleMenuCommand menuItem)
-                {
-                    menuItem.Visible = true;
-                });
+            installTruffle = this.createMenuItem(InstallTruffleId, this.InstallTruffleCallback);
+            installTestRPC = this.createMenuItem(InstallTestRPCId, this.InstallTestRPCCallback);
 
-                if (truffleInstalled == true)
-                {
-                    projectOnlyMenuItems.ForEach(delegate (OleMenuCommand menuItem)
-                    {
-                        menuItem.Enabled = true;
-                    });
-                }
-            };
+            startTestRPC = this.createMenuItem(StartTestRPCId, this.StartTestRPCCallback);
+            stopTestRPC = this.createMenuItem(StopTestRPCId, this.StopTestRPCCallback);
 
-            ((TrufflePackage)this.package).OnClose += () =>
-            {
-                allMenuItems.ForEach(delegate (OleMenuCommand menuItem)
-                {
-                    menuItem.Visible = false;
-                });
+            about = this.createMenuItem(AboutCommandId, this.ShowAboutCallback);
 
-                projectOnlyMenuItems.ForEach(delegate (OleMenuCommand menuItem)
-                {
-                    menuItem.Enabled = false;
-                });
-            };
+            // Add items to project only menus list
+            projectOnlyMenuItems.Add(compile);
+            projectOnlyMenuItems.Add(migrate);
+            projectOnlyMenuItems.Add(test);
+
+            ((TrufflePackage)this.package).OnOpen += HandleProjectEnvironmentChange;
+            ((TrufflePackage)this.package).OnClose += HandleProjectEnvironmentChange;
         }
 
-        public void addCommand(int commandId, EventHandler handler, bool projectOnly = true)
+        public OleMenuCommand createMenuItem(int commandId, EventHandler handler)
         {
             OleMenuCommandService commandService = this.ServiceProvider.GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
 
@@ -96,17 +103,74 @@ namespace TruffleVSIX
             {
                 var menuCommandID = new CommandID(CommandSet, commandId);
                 var menuItem = new OleMenuCommand(handler, menuCommandID);
+                //menuItem.BeforeQueryStatus += (object sender, EventArgs e) =>
+                //{
+                //    HandleProjectEnvironmentChange();
+                //};
+                commandService.AddCommand(menuItem);
+                allMenuItems.Add(menuItem);
+                return menuItem;
+            }
 
-                if (projectOnly == true)
+            return null;
+        }
+
+        private void HandleProjectEnvironmentChange()
+        {
+            TrufflePackage package = ((TrufflePackage)this.package);
+
+            // If we're not in a solution, hide everything.
+            if (package.InSolution == false)
+            {
+                allMenuItems.ForEach(delegate (OleMenuCommand menuItem)
                 {
-                    projectOnlyMenuItems.Add(menuItem);
+                    menuItem.Visible = false;
+                });
+
+                return;
+            }
+
+            // We're in a solution. Now check environment related items.
+            allMenuItems.ForEach(delegate (OleMenuCommand menuItem)
+            {
+                bool isProjectMenuItem = projectOnlyMenuItems.Contains(menuItem);
+
+                if (menuItem == installTruffle)
+                {
+                    menuItem.Visible = !package.TruffleInstalled;
+                }
+                else if (menuItem == installTestRPC)
+                {
+                    // menuItem.Visible = !package.TestRPCInstalled;
+                    menuItem.Visible = false; // TestRPC is a dependency of Truffle. TODO: Remove this item.
+                }
+                else if (menuItem == startTestRPC)
+                {
+                    menuItem.Visible = package.TestRPCInstalled && !package.CheckTestRPCRunning();
+                }
+                else if (menuItem == stopTestRPC)
+                {
+                    menuItem.Visible = package.TestRPCInstalled && package.CheckTestRPCRunning();
+                }
+                else if (menuItem == initializeProject)
+                {
+                    menuItem.Visible = package.TruffleInstalled && !package.TruffleProjectInitialized;
+                }
+                else
+                {
+                    menuItem.Visible = true;
                 }
 
-                allMenuItems.Add(menuItem);
-
-                commandService.AddCommand(menuItem);
-            }
-        }
+                
+                if (isProjectMenuItem == true)
+                {
+                    menuItem.Enabled = package.TruffleInstalled && package.TruffleProjectInitialized;
+                } else
+                {
+                    menuItem.Enabled = true;
+                }
+            });
+        } 
 
         /// <summary>
         /// Gets the instance of the command.
@@ -137,7 +201,6 @@ namespace TruffleVSIX
             Instance = new TruffleMenu(package);
         }
 
-
         private void BeforeQueryStatusCallback(object sender, EventArgs e)
         {
             var cmd = (OleMenuCommand)sender;
@@ -146,47 +209,138 @@ namespace TruffleVSIX
 
         private void CompileCallback(object sender, EventArgs e)
         {
-            // Get the instance number 0 of this tool window. This window is single instance so this instance
-            // is actually the only one.
-            // The last flag is set to true so that if the tool window does not exists it will be created.
-            ToolWindowPane window = this.package.FindToolWindow(typeof(ToolWindow), 0, true);
-            if ((null == window) || (null == window.Frame))
+            OutputPane pane = package.TrufflePane;
+            pane.Clear();
+            pane.AddLine("Compiling...");
+            pane.RunTruffleCommand("compile --all", () =>
             {
-                throw new NotSupportedException("Cannot create tool window");
-            }
-
-            IVsWindowFrame windowFrame = (IVsWindowFrame)window.Frame;
-            Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(windowFrame.Show());
-
-            ((ToolWindow)window).RunTruffleCommand("compile");
+                pane.AddLine("Done.");
+            });
         }
 
-        /// <summary>
-        /// This function is the callback used to execute the command when the menu item is clicked.
-        /// See the constructor to see how the menu item is associated with this function using
-        /// OleMenuCommandService service and MenuCommand class.
-        /// </summary>
-        /// <param name="sender">Event sender.</param>
-        /// <param name="e">Event args.</param>
-        private void MenuItemCallback(object sender, EventArgs e)
+        private void MigrateCallback(object sender, EventArgs e)
         {
-            string message = string.Format(CultureInfo.CurrentCulture, "Inside {0}.MenuItemCallback()", this.GetType().FullName);
-            string title = "Command1 " + this.GetType().FullName;
-    
-            // Show a message box to prove we were here
-            VsShellUtilities.ShowMessageBox(
-                this.ServiceProvider,
-                message,
-                title,
-                OLEMSGICON.OLEMSGICON_INFO,
-                OLEMSGBUTTON.OLEMSGBUTTON_OK,
-                OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
+            OutputPane pane = package.TrufflePane;
+            pane.Clear();
+            pane.AddLine("Migrating...");
+            pane.RunTruffleCommand("migrate --reset", () =>
+            {
+                pane.AddLine("Done.");
+            });
         }
 
-        private void ShowAboutBoxCallback(object sender, EventArgs e)
+        private void TestCallback(object sender, EventArgs e)
         {
-            AboutBox aboutBox = new AboutBox();
-            aboutBox.Show();
+            OutputPane pane = package.TrufflePane;
+            pane.Clear();
+            pane.AddLine("Running tests...");
+            pane.RunTruffleCommand("test", () =>
+            {
+                pane.AddLine("Done.");
+            });
+        }
+
+        private void InitializeProjectCallback(object sender, EventArgs e)
+        {
+            OutputPane pane = package.TrufflePane;
+            pane.Clear();
+            pane.AddLine("Initializing project...");
+            pane.RunTruffleCommand("init", () =>
+            {
+                pane.AddLine("Done");
+                this.package.RecheckEnvironment();
+            });
+        }
+
+        private void InstallTruffleCallback(object sender, EventArgs e)
+        {
+            OutputPane pane = package.TrufflePane;
+
+            pane.Clear();
+            pane.AddLine("Checking Node.JS and NPM installation...");
+
+            TruffleENV.CheckNPMInstalled((isNPMInstalled) =>
+            {
+                if (isNPMInstalled == false)
+                {
+                    pane.AddLine("Cannot install Truffle. It appears you don't have Node.JS or NPM installed on your system. Please visit http://nodejs.org for more information.");
+                    return;
+                }
+
+                pane.AddLine("Installing Truffle... (this may take a minute)");
+
+                pane.RunInProject("npm install truffle@beta --save-dev", () =>
+                {
+                    pane.AddLine("Done! Checking installation...");
+
+                    if (TruffleENV.CheckTruffleInstalled(package.ProjectPath) == true)
+                    {
+                        ((TrufflePackage)this.package).RecheckEnvironment();
+                        pane.AddLine("Completed successfully.");
+                    }
+                    else
+                    {
+                        pane.AddLine("Installation failed. Please see error messages above and try again.");
+                    }
+                });
+            });
+        }
+
+        private void InstallTestRPCCallback(object sender, EventArgs e)
+        {
+            OutputPane pane = package.TrufflePane;
+
+            pane.Clear();
+            pane.AddLine("Checking Node.JS and NPM installation...");
+
+            TruffleENV.CheckNPMInstalled((isNPMInstalled) =>
+            {
+                if (isNPMInstalled == false)
+                {
+                    pane.AddLine("Cannot install TestRPC. It appears you don't have Node.JS or NPM installed on your system. Please visit http://nodejs.org for more information.");
+                    return;
+                }
+
+                pane.AddLine("Installing TestRPC... (this may take a minute)");
+
+                pane.RunInProject("npm install ethereumjs-testrpc", () =>
+                {
+                    pane.AddLine("Done! Checking installation...");
+
+                    if (TruffleENV.CheckTestRPCInstalled(package.ProjectPath) == true)
+                    {
+                        ((TrufflePackage)this.package).RecheckEnvironment();
+                        pane.AddLine("Completed successfully.");
+                    }
+                    else
+                    {
+                        pane.AddLine("Installation failed. Please see error messages above and try again.");
+                    }
+                });
+            });
+        }
+
+        private void StartTestRPCCallback(object sender, EventArgs e)
+        {
+            package.TestRPCPane.Clear();
+            package.TestRPCPane.AddLine("Starting TestRPC...");
+            package.TestRPCPane.RunCommand("\"" + TruffleENV.ExpectedTestRPCBinary(package.ProjectPath) + "\"", () =>
+            {
+                package.TestRPCPane.AddLine("Stopped.");
+                package.RecheckEnvironment();
+            });
+        }
+
+        private void StopTestRPCCallback(object sender, EventArgs e)
+        {
+            package.TestRPCPane.Kill();
+        }
+
+        private void ShowAboutCallback(object sender, EventArgs e)
+        {
+            //AboutBox aboutBox = new AboutBox();
+            //aboutBox.Show();
+            System.Diagnostics.Process.Start("http://truffleframework.com");
         }
     }
 }
